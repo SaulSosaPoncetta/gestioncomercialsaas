@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\BelongsToEmpresa;
 use App\Models\Almacen;
 use App\Models\DetalleTransferencia;
 use App\Models\MovimientoInventario;
@@ -12,7 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TransferenciaController extends Controller
-{
+{   
+    use BelongsToEmpresa;
+    
     public function __construct()
     {
         $this->middleware('auth');

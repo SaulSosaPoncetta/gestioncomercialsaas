@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Venta extends Model
-{
+{   
+    use BelongsToEmpresa;
+    
     protected $table = 'ventas';
     protected $primaryKey = 'id_venta';
     const CREATED_AT = 'fecha_venta';

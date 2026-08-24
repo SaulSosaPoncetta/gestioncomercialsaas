@@ -8,29 +8,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <style>
-    .bg-primary { background-color: #14532d !important; }
-    .btn-primary {
-        background-color: #14532d;
-        border-color: #14532d;
-    }
-    .btn-primary:hover,
-    .btn-primary:focus,
-    .btn-primary:active {
-        background-color: #1e6b3a !important;
-        border-color: #1e6b3a !important;
-    }
-    a { color: #14532d; }
-    a:hover { color: #1e6b3a; }
-    .form-control:focus, .form-select:focus {
-        border-color: #14532d;
-        box-shadow: 0 0 0 0.25rem rgba(20, 83, 45, 0.15);
-    }
-</style>
+        .bg-primary { background-color: #14532d !important; }
+        .btn-primary {
+            background-color: #14532d;
+            border-color: #14532d;
+        }
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #1e6b3a !important;
+            border-color: #1e6b3a !important;
+        }
+        a { color: #14532d; }
+        a:hover { color: #1e6b3a; }
+        .form-control:focus, .form-select:focus {
+            border-color: #14532d;
+            box-shadow: 0 0 0 0.25rem rgba(20, 83, 45, 0.15);
+        }
+    </style>
 </head>
 <body class="bg-light">
 
 <div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
-    <div class="w-100" style="max-width: 440px;">
+    <div class="w-100" style="max-width: 520px;">
 
         <div class="text-center mb-4">
             <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -38,13 +38,13 @@
                 <i class="bi bi-shop fs-2"></i>
             </div>
             <h3 class="fw-bold">Gestión Comercial</h3>
-            <p class="text-muted">Crear una cuenta</p>
+            <p class="text-muted">Creá la cuenta de tu empresa</p>
         </div>
 
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
 
-                <h5 class="fw-semibold mb-4">Registrarse</h5>
+                <h5 class="fw-semibold mb-4">Registrar mi empresa</h5>
 
                 @if($errors->any())
                 <div class="alert alert-danger py-2 mb-3">
@@ -57,11 +57,29 @@
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
+                    <div class="mb-2 text-muted small text-uppercase fw-semibold">Datos de tu empresa</div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Razón Social</label>
+                        <input type="text" name="razon_social" value="{{ old('razon_social') }}"
+                               class="form-control @error('razon_social') is-invalid @enderror"
+                               required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">CUIT / Identificación Fiscal</label>
+                        <input type="text" name="identificacion_fiscal" value="{{ old('identificacion_fiscal') }}"
+                               class="form-control @error('identificacion_fiscal') is-invalid @enderror"
+                               required>
+                    </div>
+
+                    <div class="mb-2 mt-4 text-muted small text-uppercase fw-semibold">Tu cuenta de acceso</div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre</label>
                         <input type="text" name="name" value="{{ old('name') }}"
                                class="form-control @error('name') is-invalid @enderror"
-                               required autofocus autocomplete="name">
+                               required autocomplete="name">
                     </div>
 
                     <div class="mb-3">
@@ -86,7 +104,7 @@
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-person-plus me-2"></i>Registrarse
+                            <i class="bi bi-rocket-takeoff me-2"></i>Crear mi empresa y empezar
                         </button>
                     </div>
 

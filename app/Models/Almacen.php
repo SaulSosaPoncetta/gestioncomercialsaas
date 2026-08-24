@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Almacen extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'almacenes';
     protected $primaryKey = 'id_almacen';
     public $timestamps = false;

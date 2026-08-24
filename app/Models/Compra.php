@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Compra extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'compras';
     protected $primaryKey = 'id_compra';
     public $timestamps = false;

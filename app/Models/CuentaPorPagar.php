@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class CuentaPorPagar extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'cuentas_por_pagar';
     protected $primaryKey = 'id_cxp';
     public $timestamps = false;

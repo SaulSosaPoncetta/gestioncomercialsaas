@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class NotaCreditoVenta extends Model
-{
+{   
+    use BelongsToEmpresa;
+    
     protected $table = 'notas_credito_venta';
     protected $primaryKey = 'id_nota_credito_venta';
     public $timestamps = false;

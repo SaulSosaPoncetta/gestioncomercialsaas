@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Stock extends Model
-{
+{   
+    use BelongsToEmpresa;
+    
     protected $table = 'stock';
     protected $primaryKey = 'id_stock';
     public $timestamps = false;

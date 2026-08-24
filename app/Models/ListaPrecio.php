@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class ListaPrecio extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'listas_precios';
     protected $primaryKey = 'id_lista_precio';
     public $timestamps = false;

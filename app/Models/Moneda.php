@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Moneda extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'monedas';
     protected $primaryKey = 'id_moneda';
     public $timestamps = false;

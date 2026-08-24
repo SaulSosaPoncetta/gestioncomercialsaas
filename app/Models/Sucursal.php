@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Sucursal extends Model
-{
+{   
+    use BelongsToEmpresa;
+    
     protected $table = 'sucursales';
     protected $primaryKey = 'id_sucursal';
     public $timestamps = false;

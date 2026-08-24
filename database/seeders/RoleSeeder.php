@@ -32,14 +32,9 @@ class RoleSeeder extends Seeder
         $vendedor = Role::firstOrCreate(['name' => 'vendedor']);
         $vendedor->syncPermissions(['gestionar-ventas']);
 
-        // Migrar cualquier usuario que haya quedado con el rol viejo 'usuario'
-        $rolViejo = Role::where('name', 'usuario')->first();
-        if ($rolViejo) {
-            foreach ($rolViejo->users as $user) {
-                $user->assignRole('vendedor');
-                $user->removeRole('usuario');
-            }
-            $rolViejo->delete();
-        }
+        // El rol superadmin no lleva permisos de Spatie propios: el trait
+        // BelongsToEmpresa ya lo detecta por nombre de rol y le desactiva
+        // el filtrado por empresa, viendo todo el sistema sin restricción.
+        Role::firstOrCreate(['name' => 'superadmin']);
     }
 }

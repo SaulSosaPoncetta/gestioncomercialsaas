@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class CajaChica extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'cajas_chicas';
     protected $primaryKey = 'id_caja';
     public $timestamps = false;

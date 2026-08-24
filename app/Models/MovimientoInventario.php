@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class MovimientoInventario extends Model
 {
+    use BelongsToEmpresa;
+    
     protected $table = 'movimientos_inventario';
     protected $primaryKey = 'id_movimiento';
     const CREATED_AT = 'fecha';

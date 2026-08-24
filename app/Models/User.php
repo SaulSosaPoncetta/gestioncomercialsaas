@@ -30,4 +30,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    
+    public function empresa()
+    {
+        return $this->belongsTo(\App\Models\Empresa::class, 'id_empresa', 'id_empresa');
+    }
+
 }
