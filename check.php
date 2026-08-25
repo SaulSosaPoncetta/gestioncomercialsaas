@@ -1,10 +1,7 @@
-php
-App\Models\User::all()->each(function ($u) {
-    echo $u->id . ' - ' . $u->email . ' - id_empresa: ' . ($u->id_empresa ?? 'NULL') . PHP_EOL;
-});
+DB::table('users')->where('email', 'admin@migestion.com.ar')->update(['id_empresa' => null]);
 
-echo '---EMPRESAS---' . PHP_EOL;
+$user = App\Models\User::find(3);
+$user->syncRoles(['superadmin']);
 
-App\Models\Empresa::withoutGlobalScopes()->get()->each(function ($e) {
-    echo $e->id_empresa . ' - ' . $e->razon_social . PHP_EOL;
-});
+echo 'Listo. Roles actuales: ';
+print_r($user->getRoleNames()->toArray());

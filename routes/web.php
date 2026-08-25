@@ -18,6 +18,7 @@ use App\Http\Controllers\CajaChicaController;
 use App\Http\Controllers\NotaCreditoVentaController;
 use App\Http\Controllers\NotaCreditoCompraController;
 use App\Http\Controllers\TransferenciaController;
+use App\Http\Controllers\SuperadminEmpresaController;
 
 
 Route::get('/', function () {
@@ -37,6 +38,7 @@ Route::middleware('permission:gestionar-configuracion')->group(function () {
     Route::resource('impuestos', ImpuestoController::class);
     Route::resource('monedas', MonedaController::class);
 });
+
     Route::resource('categorias', CategoriaController::class);
     Route::resource('marcas', MarcaController::class);
     Route::get('productos/exportar', [ProductoController::class, 'exportar'])->name('productos.exportar');
@@ -93,5 +95,12 @@ Route::middleware('permission:gestionar-configuracion')->group(function () {
     Route::get('transferencias/{transferencia}/remito-imprimir', [TransferenciaController::class, 'imprimirRemito'])->name('transferencias.remito.imprimir');
 
     });
+
+Route::prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('empresas', [SuperadminEmpresaController::class, 'index'])->name('empresas.index');
+    Route::get('empresas/{empresa}', [SuperadminEmpresaController::class, 'show'])->name('empresas.show');
+    Route::post('empresas/{empresa}/suspender', [SuperadminEmpresaController::class, 'suspender'])->name('empresas.suspender');
+    Route::post('empresas/{empresa}/activar', [SuperadminEmpresaController::class, 'activar'])->name('empresas.activar');
+});
 
 require __DIR__.'/auth.php';

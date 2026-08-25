@@ -101,6 +101,7 @@
                 </button>
             </div>
 
+            @unlessrole('superadmin')
             <div class="nav-header">Panel</div>
             <a class="nav-link {{ request()->is('home') ? 'active' : '' }}" href="{{ route('dashboard') }}"
                 title="Dashboard">
@@ -232,6 +233,14 @@
                     </a>
                 @endif
             @endcan
+            @endunlessrole
+            @role('superadmin')
+                <div class="nav-header">Superadmin</div>
+                <a class="nav-link {{ request()->is('superadmin*') ? 'active' : '' }}"
+                    href="{{ route('superadmin.empresas.index') }}" title="Empresas del SaaS">
+                    <i class="bi bi-buildings"></i><span class="link-label ms-2">Empresas (SaaS)</span>
+                </a>
+            @endrole
 
             <div class="mt-auto">
                 <a class="nav-link" href="{{ route('logout') }}" title="Salir"

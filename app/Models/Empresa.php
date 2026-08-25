@@ -17,7 +17,11 @@ class Empresa extends Model
         'direccion',
         'telefono',
         'email',
+        'estado',
     ];
+    protected $casts = [
+    'estado' => 'boolean',
+  ];
 
     public function sucursales()
     {
