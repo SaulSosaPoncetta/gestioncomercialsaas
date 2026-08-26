@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
+use App\Services\HubEstadoClienteService;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -30,11 +31,12 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login', compact('intentos', 'captchaActivo', 'siteKey', 'umbral'));
     }
 
-        public function store(LoginRequest $request): RedirectResponse
+           public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $user = auth()->user();
+        
         if ($user->id_empresa && $user->empresa && !$user->empresa->estado) {
             auth()->logout();
             $request->session()->invalidate();
@@ -43,6 +45,20 @@ class AuthenticatedSessionController extends Controller
             return back()->withErrors([
                 'email' => 'Tu empresa se encuentra suspendida. Contactá al administrador del sistema.',
             ]);
+        }
+
+        if ($user->id_empresa && $user->empresa) {
+            $empresa = app(HubEstadoClienteService::class)->sincronizar($user->empresa);
+
+            if (! $empresa->alDiaConElPago()) {
+                auth()->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Tu suscripción no está al día. Contactá al administrador para regularizar el pago.',
+                ]);
+            }
         }
 
         $request->session()->regenerate();

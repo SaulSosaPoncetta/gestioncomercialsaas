@@ -103,4 +103,8 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('empresas/{empresa}/activar', [SuperadminEmpresaController::class, 'activar'])->name('empresas.activar');
 });
 
+// Webhook del hub central (MiGestión Panel) avisando cambios de estado de pago
+Route::post('/webhooks/estado-cliente', \App\Http\Controllers\WebhookEstadoClienteController::class)
+    ->name('webhooks.estado-cliente');
+
 require __DIR__.'/auth.php';
