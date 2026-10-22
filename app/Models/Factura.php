@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToEmpresa;
 use Illuminate\Database\Eloquent\Model;
 
 class Factura extends Model
 {
+    use BelongsToEmpresa;
+
     protected $table = 'facturas';
     protected $primaryKey = 'id_factura';
     public $timestamps = false;
 
     protected $fillable = [
+        'id_empresa',
         'id_venta',
         'id_tipo_comprobante',
         'numero_factura',

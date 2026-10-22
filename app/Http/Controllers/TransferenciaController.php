@@ -65,11 +65,11 @@ class TransferenciaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_almacen_origen' => 'required|exists:almacenes,id_almacen|different:id_almacen_destino',
-            'id_almacen_destino' => 'required|exists:almacenes,id_almacen',
+            'id_almacen_origen' => 'required|de_empresa:almacenes,id_almacen|different:id_almacen_destino',
+            'id_almacen_destino' => 'required|de_empresa:almacenes,id_almacen',
             'motivo' => 'required|string|max:255',
             'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|exists:productos,id_producto',
+            'productos.*.id_producto' => 'required|de_empresa:productos,id_producto',
             'productos.*.cantidad' => 'required|numeric|min:0.001',
         ], [
             'id_almacen_origen.different' => 'El almacén de origen y destino deben ser distintos.',

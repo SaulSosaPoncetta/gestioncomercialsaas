@@ -68,11 +68,11 @@ class NotaCreditoVentaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_venta' => 'required|exists:ventas,id_venta',
-            'id_almacen' => 'required|exists:almacenes,id_almacen',
+            'id_venta' => 'required|de_empresa:ventas,id_venta',
+            'id_almacen' => 'required|de_empresa:almacenes,id_almacen',
             'motivo' => 'required|string|max:255',
             'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|exists:productos,id_producto',
+            'productos.*.id_producto' => 'required|de_empresa:productos,id_producto',
             'productos.*.cantidad' => 'required|numeric|min:0.001',
             'productos.*.precio_unitario' => 'required|numeric|min:0',
         ]);

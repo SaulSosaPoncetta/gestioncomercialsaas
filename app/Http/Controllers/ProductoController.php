@@ -8,6 +8,7 @@ use App\Models\Impuesto;
 use App\Models\Marca;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductoController extends Controller
 {
@@ -119,14 +120,16 @@ class ProductoController extends Controller
 
     private function validarDatos(Request $request, $idProducto = null)
     {
+        $idEmpresa = auth()->user()->id_empresa;
+
         return $request->validate([
-            'sku' => 'required|string|max:50|unique:productos,sku,' . $idProducto . ',id_producto',
-            'codigo_barras' => 'nullable|string|max:50|unique:productos,codigo_barras,' . $idProducto . ',id_producto',
+            'sku' => ['required', 'string', 'max:50', Rule::unique('productos', 'sku')->ignore($idProducto, 'id_producto')->where('id_empresa', $idEmpresa)],
+            'codigo_barras' => ['nullable', 'string', 'max:50', Rule::unique('productos', 'codigo_barras')->ignore($idProducto, 'id_producto')->where('id_empresa', $idEmpresa)],
             'nombre' => 'required|string|max:150',
             'descripcion' => 'nullable|string',
-            'id_categoria' => 'required|exists:categorias,id_categoria',
-            'id_marca' => 'nullable|exists:marcas,id_marca',
-            'id_impuesto' => 'required|exists:impuestos,id_impuesto',
+            'id_categoria' => ['required', Rule::exists('categorias', 'id_categoria')->where('id_empresa', $idEmpresa)],
+            'id_marca' => ['nullable', Rule::exists('marcas', 'id_marca')->where('id_empresa', $idEmpresa)],
+            'id_impuesto' => ['required', Rule::exists('impuestos', 'id_impuesto')->where('id_empresa', $idEmpresa)],
             'unidad_medida' => 'required|string|max:20',
             'precio_costo' => 'required|numeric|min:0',
             'stock_minimo' => 'required|integer|min:0',

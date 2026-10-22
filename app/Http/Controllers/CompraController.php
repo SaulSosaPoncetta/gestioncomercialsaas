@@ -79,16 +79,16 @@ class CompraController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_proveedor' => 'required|exists:personas,id_persona',
-            'id_sucursal' => 'required|exists:sucursales,id_sucursal',
-            'id_almacen' => 'required|exists:almacenes,id_almacen',
+            'id_proveedor' => 'required|de_empresa:personas,id_persona',
+            'id_sucursal' => 'required|de_empresa:sucursales,id_sucursal',
+            'id_almacen' => 'required|de_empresa:almacenes,id_almacen',
             'tipo_comprobante' => 'required|string|max:20',
             'numero_comprobante' => 'required|string|max:50',
             'fecha_emision' => 'required|date',
             'condicion_pago' => 'required|in:CONTADO,CREDITO',
             'dias_vencimiento' => 'nullable|integer|min:0',
             'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|exists:productos,id_producto',
+            'productos.*.id_producto' => 'required|de_empresa:productos,id_producto',
             'productos.*.cantidad' => 'required|numeric|min:0.001',
             'productos.*.costo_unitario' => 'required|numeric|min:0',
         ]);

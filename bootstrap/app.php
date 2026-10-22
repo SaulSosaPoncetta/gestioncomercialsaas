@@ -15,10 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'hub' => \App\Http\Middleware\VerificarFirmaHub::class,
 
         ]);
         $middleware->validateCsrfTokens(except: [
             'webhooks/estado-cliente',
+            'webhooks/hub/*',
         ]);
         
     })

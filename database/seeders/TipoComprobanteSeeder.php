@@ -2,21 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\TipoComprobante;
+use App\Models\Empresa;
+use App\Services\InicializarEmpresa;
 use Illuminate\Database\Seeder;
 
+/**
+ * Multi-empresa: cada empresa tiene sus propios tipos de comprobante
+ * (y los demás datos mínimos). Se delega en InicializarEmpresa, que solo crea lo que falta.
+ */
 class TipoComprobanteSeeder extends Seeder
 {
-    public function run(): void
+    public function run(InicializarEmpresa $inicializar): void
     {
-        TipoComprobante::firstOrCreate(
-            ['codigo' => 'FACT_B'],
-            ['descripcion' => 'Factura B', 'serie_prefijo' => 'B0001', 'correlativo_actual' => 0]
-        );
-
-        TipoComprobante::firstOrCreate(
-            ['codigo' => 'TICKET'],
-            ['descripcion' => 'Ticket', 'serie_prefijo' => 'T0001', 'correlativo_actual' => 0]
-        );
+        Empresa::all()->each(fn (Empresa $empresa) => $inicializar->ejecutar($empresa));
     }
 }

@@ -232,6 +232,12 @@
                         <i class="bi bi-currency-exchange"></i><span class="link-label ms-2">Monedas</span>
                     </a>
                 @endif
+                @if (Route::has('integracion-contable.index'))
+                    <a class="nav-link {{ request()->is('integracion-contable*') ? 'active' : '' }}"
+                        href="{{ route('integracion-contable.index') }}" title="Integración contable">
+                        <i class="bi bi-journal-arrow-up"></i><span class="link-label ms-2">Integración contable</span>
+                    </a>
+                @endif
             @endcan
             @endunlessrole
             @role('superadmin')

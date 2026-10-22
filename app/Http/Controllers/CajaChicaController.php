@@ -70,6 +70,10 @@ class CajaChicaController extends Controller
 
     public function guardarApertura(Request $request, CajaChica $caja)
     {
+        if ($caja->sesionAbierta()->exists()) {
+            return redirect()->route('cajas.index')->with('error', 'Esta caja ya tiene una sesión abierta.');
+        }
+
         $data = $request->validate([
             'monto_inicial' => 'required|numeric|min:0',
         ]);
@@ -98,6 +102,10 @@ class CajaChicaController extends Controller
 
     public function guardarMovimiento(Request $request, AperturaCierreCaja $sesion)
     {
+        if ($sesion->estado !== 'ABIERTA') {
+            return redirect()->route('cajas.sesion', $sesion)->with('error', 'La sesión de caja ya está cerrada.');
+        }
+
         $data = $request->validate([
             'tipo' => 'required|in:INGRESO,EGRESO',
             'concepto' => 'required|string|max:150',
@@ -112,6 +120,10 @@ class CajaChicaController extends Controller
 
     public function formularioCierre(AperturaCierreCaja $sesion)
     {
+        if ($sesion->estado !== 'ABIERTA') {
+            return redirect()->route('cajas.sesion', $sesion)->with('error', 'La sesión de caja ya está cerrada.');
+        }
+
         $ingresos = $sesion->movimientos->where('tipo', 'INGRESO')->sum('monto');
         $egresos = $sesion->movimientos->where('tipo', 'EGRESO')->sum('monto');
         $saldoSistema = $sesion->monto_inicial + $ingresos - $egresos;
@@ -121,6 +133,10 @@ class CajaChicaController extends Controller
 
     public function guardarCierre(Request $request, AperturaCierreCaja $sesion)
     {
+        if ($sesion->estado !== 'ABIERTA') {
+            return redirect()->route('cajas.sesion', $sesion)->with('error', 'La sesión de caja ya está cerrada.');
+        }
+
         $data = $request->validate([
             'monto_final_real' => 'required|numeric|min:0',
         ]);
@@ -144,7 +160,7 @@ class CajaChicaController extends Controller
     private function validarDatos(Request $request)
     {
         return $request->validate([
-            'id_sucursal' => 'required|exists:sucursales,id_sucursal',
+            'id_sucursal' => 'required|de_empresa:sucursales,id_sucursal',
             'nombre' => 'required|string|max:50',
         ]);
     }

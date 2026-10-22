@@ -86,8 +86,12 @@ class ListaPrecioController extends Controller
             'precios.*' => 'nullable|numeric|min:0',
         ]);
 
+        // Solo productos de la empresa (Producto está filtrado por empresa)
+        $propios = Producto::whereIn('id_producto', array_keys($request->input('precios', [])))
+            ->pluck('id_producto')->flip();
+
         foreach ($request->input('precios', []) as $idProducto => $precioVenta) {
-            if ($precioVenta === null || $precioVenta === '') {
+            if ($precioVenta === null || $precioVenta === '' || ! isset($propios[$idProducto])) {
                 continue;
             }
 

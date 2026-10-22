@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Moneda;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MonedaController extends Controller
 {
@@ -64,7 +65,7 @@ class MonedaController extends Controller
     private function validarDatos(Request $request, $idMoneda = null)
     {
         return $request->validate([
-            'codigo' => 'required|string|max:5|unique:monedas,codigo,' . $idMoneda . ',id_moneda',
+            'codigo' => ['required', 'string', 'max:5', Rule::unique('monedas', 'codigo')->ignore($idMoneda, 'id_moneda')->where('id_empresa', auth()->user()->id_empresa)],
             'nombre' => 'required|string|max:50',
             'simbolo' => 'required|string|max:5',
             'tipo_cambio' => 'required|numeric|min:0',

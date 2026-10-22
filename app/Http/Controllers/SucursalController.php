@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Empresa;
 use App\Models\Sucursal;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SucursalController extends Controller
 {
@@ -21,7 +22,7 @@ class SucursalController extends Controller
 
     public function create()
     {
-        $empresas = Empresa::orderBy('razon_social')->get();
+        $empresas = $this->empresasPermitidas();
         return view('sucursales.create', compact('empresas'));
     }
 
@@ -36,7 +37,7 @@ class SucursalController extends Controller
 
     public function edit(Sucursal $sucursale)
     {
-        $empresas = Empresa::orderBy('razon_social')->get();
+        $empresas = $this->empresasPermitidas();
         return view('sucursales.edit', ['sucursal' => $sucursale, 'empresas' => $empresas]);
     }
 
@@ -56,12 +57,30 @@ class SucursalController extends Controller
         return redirect()->route('sucursales.index')->with('success', 'Sucursal eliminada correctamente.');
     }
 
+    /** El superadmin elige la empresa; un cliente solo puede usar la suya. */
+    private function empresasPermitidas()
+    {
+        return auth()->user()->hasRole('superadmin')
+            ? Empresa::orderBy('razon_social')->get()
+            : Empresa::where('id_empresa', auth()->user()->id_empresa)->get();
+    }
+
     private function validarDatos(Request $request, $idSucursal = null)
     {
+        $esSuperadmin = auth()->user()->hasRole('superadmin');
+
+        // Un cliente no puede crear ni mover sucursales a otra empresa
+        if (! $esSuperadmin) {
+            $request->merge(['id_empresa' => auth()->user()->id_empresa]);
+        }
+
         return $request->validate([
             'id_empresa' => 'required|exists:empresas,id_empresa',
             'nombre' => 'required|string|max:100',
-            'codigo' => 'required|string|max:10|unique:sucursales,codigo,' . $idSucursal . ',id_sucursal',
+            'codigo' => [
+                'required', 'string', 'max:10',
+                Rule::unique('sucursales', 'codigo')->ignore($idSucursal, 'id_sucursal')->where('id_empresa', $request->input('id_empresa')),
+            ],
             'direccion' => 'nullable|string',
             'telefono' => 'nullable|string|max:30',
         ]);

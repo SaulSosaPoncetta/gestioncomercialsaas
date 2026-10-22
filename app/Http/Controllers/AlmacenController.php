@@ -57,7 +57,7 @@ class AlmacenController extends Controller
     private function validarDatos(Request $request)
     {
         return $request->validate([
-            'id_sucursal' => 'required|exists:sucursales,id_sucursal',
+            'id_sucursal' => 'required|de_empresa:sucursales,id_sucursal',
             'nombre' => 'required|string|max:100',
             'ubicacion' => 'nullable|string',
         ]);

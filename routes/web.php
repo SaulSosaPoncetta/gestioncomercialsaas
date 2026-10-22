@@ -19,6 +19,7 @@ use App\Http\Controllers\NotaCreditoVentaController;
 use App\Http\Controllers\NotaCreditoCompraController;
 use App\Http\Controllers\TransferenciaController;
 use App\Http\Controllers\SuperadminEmpresaController;
+use App\Http\Controllers\IntegracionContableController;
 
 
 Route::get('/', function () {
@@ -37,6 +38,13 @@ Route::middleware('permission:gestionar-configuracion')->group(function () {
     Route::resource('sucursales', SucursalController::class);
     Route::resource('impuestos', ImpuestoController::class);
     Route::resource('monedas', MonedaController::class);
+
+    // Integración con el sistema contable de MiGestión
+    Route::get('integracion-contable', [IntegracionContableController::class, 'index'])->name('integracion-contable.index');
+    Route::put('integracion-contable', [IntegracionContableController::class, 'update'])->name('integracion-contable.update');
+    Route::post('integracion-contable/probar', [IntegracionContableController::class, 'probar'])->name('integracion-contable.probar');
+    Route::post('integracion-contable/sincronizar', [IntegracionContableController::class, 'sincronizar'])->name('integracion-contable.sincronizar');
+    Route::post('integracion-contable/{sincronizacion}/reenviar', [IntegracionContableController::class, 'reenviar'])->name('integracion-contable.reenviar');
 });
 
     Route::resource('categorias', CategoriaController::class);
@@ -106,5 +114,10 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 // Webhook del hub central (MiGestión Panel) avisando cambios de estado de pago
 Route::post('/webhooks/estado-cliente', \App\Http\Controllers\WebhookEstadoClienteController::class)
     ->name('webhooks.estado-cliente');
+
+// Orden firmada del hub: vincular / desvincular la contabilidad (token generado por MiGestión Contable)
+Route::post('/webhooks/hub/integracion-contable', \App\Http\Controllers\WebhookIntegracionContableController::class)
+    ->middleware(['hub', 'throttle:30,1'])
+    ->name('webhooks.hub.integracion-contable');
 
 require __DIR__.'/auth.php';

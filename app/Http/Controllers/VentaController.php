@@ -83,15 +83,15 @@ class VentaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_cliente' => 'required|exists:personas,id_persona',
-            'id_sucursal' => 'required|exists:sucursales,id_sucursal',
-            'id_almacen' => 'required|exists:almacenes,id_almacen',
+            'id_cliente' => 'required|de_empresa:personas,id_persona',
+            'id_sucursal' => 'required|de_empresa:sucursales,id_sucursal',
+            'id_almacen' => 'required|de_empresa:almacenes,id_almacen',
             'tipo_venta' => 'required|in:CONTADO,CREDITO',
             'dias_vencimiento' => 'nullable|integer|min:0',
             'emitir_factura' => 'nullable|boolean',
-            'id_tipo_comprobante' => 'required_if:emitir_factura,1|nullable|exists:tipos_comprobante,id_tipo_comprobante',
+            'id_tipo_comprobante' => 'required_if:emitir_factura,1|nullable|de_empresa:tipos_comprobante,id_tipo_comprobante',
             'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|exists:productos,id_producto',
+            'productos.*.id_producto' => 'required|de_empresa:productos,id_producto',
             'productos.*.cantidad' => 'required|numeric|min:0.001',
             'productos.*.precio_unitario' => 'required|numeric|min:0',
             'productos.*.descuento' => 'nullable|numeric|min:0',
@@ -204,6 +204,7 @@ class VentaController extends Controller
                     $numeroFactura = $tipoComprobante->serie_prefijo . '-' . str_pad($tipoComprobante->correlativo_actual, 8, '0', STR_PAD_LEFT);
 
                     Factura::create([
+                        'id_empresa' => $venta->id_empresa,
                         'id_venta' => $venta->id_venta,
                         'id_tipo_comprobante' => $tipoComprobante->id_tipo_comprobante,
                         'numero_factura' => $numeroFactura,
@@ -232,8 +233,9 @@ class VentaController extends Controller
 
     public function preciosPorLista(Request $request)
     {
-        $idLista = $request->input('id_lista_precio');
-        $precios = PrecioProducto::where('id_lista_precio', $idLista)->pluck('precio_venta', 'id_producto');
+        // findOrFail con el filtro por empresa: una lista de otra empresa da 404
+        $lista = \App\Models\ListaPrecio::findOrFail($request->input('id_lista_precio'));
+        $precios = PrecioProducto::where('id_lista_precio', $lista->id_lista_precio)->pluck('precio_venta', 'id_producto');
         return response()->json($precios);
     }
         public function imprimirFactura(Venta $venta)

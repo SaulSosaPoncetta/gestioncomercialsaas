@@ -82,8 +82,8 @@ class StockController extends Controller
     public function guardarAjuste(Request $request)
     {
         $data = $request->validate([
-            'id_producto' => 'required|exists:productos,id_producto',
-            'id_almacen' => 'required|exists:almacenes,id_almacen',
+            'id_producto' => 'required|de_empresa:productos,id_producto',
+            'id_almacen' => 'required|de_empresa:almacenes,id_almacen',
             'cantidad_nueva' => 'required|numeric|min:0',
             'motivo' => 'required|string|max:255',
         ]);

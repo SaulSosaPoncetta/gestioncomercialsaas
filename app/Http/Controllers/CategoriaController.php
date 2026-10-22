@@ -59,7 +59,7 @@ class CategoriaController extends Controller
     private function validarDatos(Request $request, $idCategoria = null)
     {
         return $request->validate([
-            'id_categoria_padre' => 'nullable|exists:categorias,id_categoria|different:id_actual_dummy',
+            'id_categoria_padre' => 'nullable|de_empresa:categorias,id_categoria|different:id_actual_dummy',
             'nombre' => 'required|string|max:100',
         ]);
     }

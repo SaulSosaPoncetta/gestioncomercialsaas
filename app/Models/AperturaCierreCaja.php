@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AperturaCierreCaja extends Model
@@ -32,6 +33,19 @@ class AperturaCierreCaja extends Model
         'diferencia' => 'decimal:2',
     ];
 
+
+    /**
+     * Multi-empresa: esta tabla no tiene id_empresa; se filtra por la caja,
+     * que sí está filtrada por la empresa del usuario logueado.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('empresa', function (Builder $builder) {
+            if (auth()->check() && ! auth()->user()->hasRole('superadmin')) {
+                $builder->whereHas('caja');
+            }
+        });
+    }
     public function caja()
     {
         return $this->belongsTo(CajaChica::class, 'id_caja', 'id_caja');

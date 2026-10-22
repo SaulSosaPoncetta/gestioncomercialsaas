@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PersonaController extends Controller
 {
@@ -71,7 +72,10 @@ class PersonaController extends Controller
             'tipo_persona' => 'required|in:CLIENTE,PROVEEDOR,EMPLEADO,AMBOS',
             'razon_social_nombre' => 'required|string|max:150',
             'tipo_documento' => 'required|in:DNI,CUIT,CUIL,RUC,PASAPORTE,OTRO',
-            'numero_documento' => 'required|string|max:25|unique:personas,numero_documento,' . $idPersona . ',id_persona',
+            'numero_documento' => [
+                'required', 'string', 'max:25',
+                Rule::unique('personas', 'numero_documento')->ignore($idPersona, 'id_persona')->where('id_empresa', auth()->user()->id_empresa),
+            ],
             'condicion_iva' => 'required|string|max:50',
             'direccion' => 'nullable|string',
             'telefono' => 'nullable|string|max:30',

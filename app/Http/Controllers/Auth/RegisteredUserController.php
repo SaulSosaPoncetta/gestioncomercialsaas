@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use App\Models\User;
+use App\Services\HubClientes;
+use App\Services\InicializarEmpresa;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +40,9 @@ class RegisteredUserController extends Controller
                 'estado' => true,
             ]);
 
+            // Datos iniciales propios de la empresa: sucursal, depósito, IVA, moneda y tipos de comprobante
+            app(InicializarEmpresa::class)->ejecutar($empresa);
+
             $user = User::create([
                 'id_empresa' => $empresa->id_empresa,
                 'name' => $request->name,
@@ -52,6 +57,9 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+
+        // Alta en MiGestión Panel (si ya usa la Contabilidad, el hub vincula los dos sistemas solo)
+        dispatch(fn () => app(HubClientes::class)->registrar($user->empresa, $user->email))->afterResponse();
 
         return redirect(route('dashboard'));
     }

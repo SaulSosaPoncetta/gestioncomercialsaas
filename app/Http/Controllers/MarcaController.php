@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MarcaController extends Controller
 {
@@ -54,7 +55,7 @@ class MarcaController extends Controller
     private function validarDatos(Request $request, $idMarca = null)
     {
         return $request->validate([
-            'nombre' => 'required|string|max:100|unique:marcas,nombre,' . $idMarca . ',id_marca',
+            'nombre' => ['required', 'string', 'max:100', Rule::unique('marcas', 'nombre')->ignore($idMarca, 'id_marca')->where('id_empresa', auth()->user()->id_empresa)],
         ]);
     }
 }
