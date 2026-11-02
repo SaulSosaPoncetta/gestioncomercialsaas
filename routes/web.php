@@ -28,7 +28,6 @@ Route::get('/landing', fn () => redirect()->route('landing.index')); // compatib
 Route::post('/landing/registrar', [\App\Http\Controllers\LandingController::class, 'registrar'])->name('landing.registrar');
 Route::get('/activar/{token}', [\App\Http\Controllers\LandingController::class, 'activar'])->name('landing.activar');
 
-Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
