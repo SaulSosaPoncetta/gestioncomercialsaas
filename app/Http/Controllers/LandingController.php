@@ -7,7 +7,8 @@ use App\Mail\BienvenidaEmpresaMail;
 use App\Models\Empresa;
 use App\Models\Plan;
 use App\Models\User;
-use App\Services\HubEstadoClienteService;
+use App\Services\HubClientes;
+use App\Services\InicializarEmpresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -46,7 +47,7 @@ class LandingController extends Controller
 
             $plan = Plan::findOrFail($data['plan_id']);
 
-            $empresa = Empresa::create([
+            $empresa = Empresa::withoutGlobalScopes()->create([
                 'razon_social' => $data['razon_social'],
                 'identificacion_fiscal' => $data['identificacion_fiscal'],
                 'email' => $data['email'],
@@ -54,6 +55,9 @@ class LandingController extends Controller
                 'estado' => true,
                 'estado_pago' => 'sin_verificar',
             ]);
+
+            // Datos iniciales propios de la empresa: sucursal, depósito, IVA, moneda y tipos de comprobante
+            app(InicializarEmpresa::class)->ejecutar($empresa);
 
             $token = Str::random(64);
 
@@ -79,6 +83,8 @@ class LandingController extends Controller
                 'message' => 'Te enviamos un mail de activación a '.$user->email,
             ]);
         } catch (ValidationException $e) {
+            DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => collect($e->errors())->flatten()->first() ?? 'Los datos ingresados no son válidos.',
@@ -94,7 +100,7 @@ class LandingController extends Controller
         }
     }
 
-    public function activar(string $token, HubEstadoClienteService $hub)
+    public function activar(string $token)
     {
         try {
             DB::beginTransaction();
@@ -102,6 +108,8 @@ class LandingController extends Controller
             $user = User::where('activation_token', $token)->first();
 
             if (! $user) {
+                DB::rollBack();
+
                 return redirect()->route('landing.index')
                     ->with('error', 'El link de activación es inválido o ya fue usado.');
             }
@@ -118,7 +126,14 @@ class LandingController extends Controller
 
             Mail::to($user->email)->send(new ActivacionEmpresaMail($empresa));
 
-            $hub->registrar($empresa, $empresa->plan?->nombre, $empresa->plan?->precio);
+            // Alta en MiGestión Panel con el plan elegido en la landing
+            // (si ya usa la Contabilidad, el hub vincula los dos sistemas solo)
+            app(HubClientes::class)->registrar(
+                $empresa,
+                $user->email,
+                $empresa->plan?->nombre,
+                $empresa->plan ? (float) $empresa->plan->precio : null,
+            );
 
             return redirect()->route('login')
                 ->with('success', 'Cuenta activada correctamente. Ya podés iniciar sesión.');

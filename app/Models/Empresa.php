@@ -17,6 +17,7 @@ class Empresa extends Model
         'direccion',
         'telefono',
         'email',
+        'plan_id',
         'estado',
         'estado_pago',
         'fecha_verificacion_pago',
@@ -43,6 +44,11 @@ class Empresa extends Model
     public function alDiaConElPago(): bool
     {
         return in_array($this->estado_pago, ['activa', 'sin_verificar'], true);
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
     }
 
     public function sucursales()

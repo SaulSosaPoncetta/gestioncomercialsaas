@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 class HubClientes
 {
-    public function registrar(?Empresa $empresa, ?string $emailAdministrador = null): bool
+    public function registrar(?Empresa $empresa, ?string $emailAdministrador = null, ?string $plan = null, ?float $monto = null): bool
     {
         if (! $empresa || ! config('migestion_hub.url') || ! config('migestion_hub.api_key')) {
             return false;
@@ -35,7 +35,12 @@ class HubClientes
             'telefono'              => $empresa->telefono,
         ];
 
-        if (config('migestion_hub.plan') && config('migestion_hub.monto') !== null) {
+        if ($plan !== null && $monto !== null) {
+            // Plan elegido por la empresa en la landing
+            $datos['plan'] = $plan;
+            $datos['monto'] = $monto;
+            $datos['tipo'] = 'recurrente';
+        } elseif (config('migestion_hub.plan') && config('migestion_hub.monto') !== null) {
             $datos['plan'] = config('migestion_hub.plan');
             $datos['monto'] = (float) config('migestion_hub.monto');
         }

@@ -18,10 +18,17 @@ use App\Http\Controllers\CajaChicaController;
 use App\Http\Controllers\NotaCreditoVentaController;
 use App\Http\Controllers\NotaCreditoCompraController;
 use App\Http\Controllers\TransferenciaController;
+use App\Http\Controllers\SuperadminEmpresaController;
+use App\Http\Controllers\IntegracionContableController;
+
 
 // Página de inicio pública: la landing (si ya hay sesión, va directo al sistema)
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('landing.index');
+Route::get('/landing', fn () => redirect()->route('landing.index')); // compatibilidad con el enlace anterior
+Route::post('/landing/registrar', [\App\Http\Controllers\LandingController::class, 'registrar'])->name('landing.registrar');
+Route::get('/activar/{token}', [\App\Http\Controllers\LandingController::class, 'activar'])->name('landing.activar');
 
+Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
@@ -33,7 +40,15 @@ Route::middleware('permission:gestionar-configuracion')->group(function () {
     Route::resource('sucursales', SucursalController::class);
     Route::resource('impuestos', ImpuestoController::class);
     Route::resource('monedas', MonedaController::class);
+
+    // Integración con el sistema contable de MiGestión
+    Route::get('integracion-contable', [IntegracionContableController::class, 'index'])->name('integracion-contable.index');
+    Route::put('integracion-contable', [IntegracionContableController::class, 'update'])->name('integracion-contable.update');
+    Route::post('integracion-contable/probar', [IntegracionContableController::class, 'probar'])->name('integracion-contable.probar');
+    Route::post('integracion-contable/sincronizar', [IntegracionContableController::class, 'sincronizar'])->name('integracion-contable.sincronizar');
+    Route::post('integracion-contable/{sincronizacion}/reenviar', [IntegracionContableController::class, 'reenviar'])->name('integracion-contable.reenviar');
 });
+
     Route::resource('categorias', CategoriaController::class);
     Route::resource('marcas', MarcaController::class);
     Route::get('productos/exportar', [ProductoController::class, 'exportar'])->name('productos.exportar');
@@ -91,11 +106,20 @@ Route::middleware('permission:gestionar-configuracion')->group(function () {
 
     });
 
+Route::prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('empresas', [SuperadminEmpresaController::class, 'index'])->name('empresas.index');
+    Route::get('empresas/{empresa}', [SuperadminEmpresaController::class, 'show'])->name('empresas.show');
+    Route::post('empresas/{empresa}/suspender', [SuperadminEmpresaController::class, 'suspender'])->name('empresas.suspender');
+    Route::post('empresas/{empresa}/activar', [SuperadminEmpresaController::class, 'activar'])->name('empresas.activar');
+});
+
 // Webhook del hub central (MiGestión Panel) avisando cambios de estado de pago
 Route::post('/webhooks/estado-cliente', \App\Http\Controllers\WebhookEstadoClienteController::class)
     ->name('webhooks.estado-cliente');
-// Landing pública de Gestión Comercial
-Route::get('/landing', fn () => redirect()->route('landing.index')); // compatibilidad con el enlace anterior
-Route::post('/landing/registrar', [\App\Http\Controllers\LandingController::class, 'registrar'])->name('landing.registrar');
-Route::get('/activar/{token}', [\App\Http\Controllers\LandingController::class, 'activar'])->name('landing.activar');
+
+// Orden firmada del hub: vincular / desvincular la contabilidad (token generado por MiGestión Contable)
+Route::post('/webhooks/hub/integracion-contable', \App\Http\Controllers\WebhookIntegracionContableController::class)
+    ->middleware(['hub', 'throttle:30,1'])
+    ->name('webhooks.hub.integracion-contable');
+
 require __DIR__.'/auth.php';
